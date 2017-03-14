@@ -4,6 +4,22 @@ exports.apiKey = "1c03ca5ff40ee1b1e7aa492546a3574c";
 },{}],2:[function(require,module,exports){
 var apiKey = require('./../.env').apiKey;
 
+var Temperature = function(){
+}
+
+Temperature.prototype.getTemperature = function(city, displayFunction) {
+  $.get('http://api.openweathermap.org/data/2.5/weather?q=' + city + '&appid=' + apiKey).then(function(response) {
+    displayFunction(city, response.main.temp);
+  }).fail(function(error) {
+    $('.showTemperature').text(error.responseJSON.message);
+  });
+}
+
+exports.temperatureModule = Temperature;
+
+},{"./../.env":1}],3:[function(require,module,exports){
+var apiKey = require('./../.env').apiKey;
+
 Weather = function(){
 }
 
@@ -17,7 +33,24 @@ Weather.prototype.getWeather = function(city, displayFunction) {
 
 exports.weatherModule = Weather;
 
-},{"./../.env":1}],3:[function(require,module,exports){
+},{"./../.env":1}],4:[function(require,module,exports){
+var Temperature = require('./../js/temperature.js').temperatureModule;
+var displayCelcisus = 0;
+var displayTemperature = function(city, tempData) {
+  $('.showTemperature').text("The temperature in " + city + " is " + tempData + ".s");
+  $('.showFahrenheit').text("The temperature in this city is " + 9 / 5 * (tempData - 273) + 32);
+  $('.showCelcius').text("The temperature in this city is " + (tempData - 273));
+}
+
+$(document).ready(function() {
+  var currentTemperatureObject = new Temperature();
+  $('#temperatureLocation').click(function() {
+    var city = $('#location').val();
+    $('#location').val("");
+    currentTemperatureObject.getTemperature(city, displayTemperature);
+  });
+});
+
 $(document).ready(function(){
   $('#time').text(moment());
 });
@@ -37,4 +70,4 @@ $(document).ready(function() {
   });
 });
 
-},{"./../js/weather.js":2}]},{},[3]);
+},{"./../js/temperature.js":2,"./../js/weather.js":3}]},{},[4]);
